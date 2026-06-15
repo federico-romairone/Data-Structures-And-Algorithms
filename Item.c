@@ -57,7 +57,7 @@ status item_fill_from_file(ITEM item, FILE *fin) {
 
     if (item == NULL || fin == NULL) result = INVALID_INPUT;
     else {
-        n = fscanf(fin, "%d %s\n", &(item->num), item->str);
+        n = fscanf(fin, "%d %s", &(item->num), item->str);
         if (n == 2) item->initialized = TRUE;
         else if (feof(fin)) result = END_OF_FILE;
         else result = INVALID_FILE_FORMAT;
@@ -72,7 +72,8 @@ status item_fill_from_keyboard(ITEM item) {
 
     if (item == NULL) result = INVALID_INPUT;
     else {
-        n = scanf("%d %s\n", &(item->num), item->str);
+        printf("<number> <string>: ");
+        n = scanf("%d %s", &(item->num), item->str);
         if (n != 2) result = INVALID_FILE_FORMAT;
         else item->initialized = TRUE;
     }

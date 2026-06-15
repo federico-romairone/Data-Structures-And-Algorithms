@@ -134,18 +134,19 @@ status array_fill_from_file(ARRAY array, char *fname) {
 status array_fill_from_keyboard(ARRAY array) {
     status result = SUCCESS;
     boolean user_stop = FALSE;
-    char buffer[100];
-    int i;
+    char user_in, buffer[100];
+    int i, old_size;
 
     do {
         // array is full
         if (array->n == array->size) {
             // reallocate
+            old_size = array->size;
             array->size *= 2;
             array->items = (ITEM*)realloc(array->items, array->size * sizeof(ITEM));
             if (array->items == NULL) { result = OUT_OF_MEMORY; break; }
             else {
-                for (i = 0; i < array->size && result == SUCCESS; i++)
+                for (i = old_size; i < array->size && result == SUCCESS; i++)
                     result = item_create(&(array->items[i]));
             }
         }
@@ -153,11 +154,10 @@ status array_fill_from_keyboard(ARRAY array) {
         if (result == SUCCESS) {
             (array->n)++;
             printf("Do you want to insert a new item?\nType 'y' for 'yes' ore everything else for 'no': ");
-            // clean input in case user digits more then one char (no thrash in buffer for next scan)
-            fgets(buffer, sizeof(buffer), stdin);
-            if ('y' != buffer[0]) user_stop = TRUE;
+            scanf(" %c", &user_in);
+            if (user_in != 'y') user_stop = TRUE;
         }
-    } while (result == SUCCESS && !user_stop && !feof(stdin));
+    } while (result == SUCCESS && !user_stop);
 
     return result;
 }

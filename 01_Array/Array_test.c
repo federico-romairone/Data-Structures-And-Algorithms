@@ -194,6 +194,8 @@ void test_array_fill_from_keyboard_single_item() {
     TEST_ASSERT(result == SUCCESS,
                 "array_fill_from_keyboard returns SUCCESS after reading one item");
     
+    array_write_out(array, stdout);
+
     array_destroy(array);
 }
 
@@ -203,7 +205,7 @@ void test_array_fill_from_keyboard_multiple_items() {
     status result = SUCCESS;
     int size, cardinality;
 
-    printf("Instructions: type one item, then 'n' to stop → expected SUCCESS\n");
+    printf("Instructions: type more items, then 'n' to stop → expected SUCCESS\n");
     array_create(&array);
     result = array_fill_from_keyboard(array);
     array_get_size(array, &size);
@@ -211,6 +213,8 @@ void test_array_fill_from_keyboard_multiple_items() {
     printf("size='%d' n='%d'\n", size, cardinality);
     TEST_ASSERT(result == SUCCESS,
                 "array_fill_from_keyboard returns SUCCESS after reading one item");
+    
+    array_write_out(array, stdout);
     
     array_destroy(array);
 }
