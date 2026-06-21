@@ -6,12 +6,12 @@
 
 #define INITIAL_SIZE 1
 
-typedef struct array *ARRAY;
+typedef struct array* ARRAY;
 
 // Memory handling
 
 /**
- * @brief Allocates and initializes a new dynamic array in the container.
+ * @brief Allocates and initializes a new dynamic array container.
  * @param[out] array_pnt Pointer to the container to initialize.
  * @return The type of error occurred, SUCCESS if none.
  */
@@ -58,14 +58,14 @@ status array_get_first_element_pointer(ARRAY array, ITEM **items_pnt);
  * @param[in] fin   Pointer to the file.
  * @return The type of error occurred, SUCCESS if none.
  */
-status array_fill_from_file(ARRAY array, char *fname);
+status array_insert_from_file(ARRAY array, char *fname);
 
 /**
  * @brief Fills the array with items from a keyboard (user input).
  * @param[in] array Selected array.
  * @return The type of error occurred, SUCCESS if none.
  */
-status array_fill_from_keyboard(ARRAY array);
+status array_insert_from_keyboard(ARRAY array);
 
 // Output
 

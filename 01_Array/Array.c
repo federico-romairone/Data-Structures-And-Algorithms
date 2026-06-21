@@ -53,10 +53,9 @@ status array_destroy(ARRAY array) {
     status result = SUCCESS;
     int i;
 
-    if (array == NULL) result = INVALID_INPUT;
-    else {
-        for (i = 0; i < array->size && result == SUCCESS; i++) 
-            result = item_destroy(array->items[i]);
+    for (i = 0; i < array->size && result == SUCCESS; i++) 
+        result = item_destroy(array->items[i]);
+    if (result == SUCCESS) {
         if (array->items != NULL) free(array->items);
         free(array);
     }
@@ -95,7 +94,7 @@ status array_get_first_element_pointer(ARRAY array, ITEM **items_pnt) {
 
 // Input 
 
-status array_fill_from_file(ARRAY array, char *fname) {
+status array_insert_from_file(ARRAY array, char *fname) {
     FILE *fin;
     status result = SUCCESS;
     int i, old_size;
@@ -119,7 +118,7 @@ status array_fill_from_file(ARRAY array, char *fname) {
                     }
                 }
                 if (result == SUCCESS) {
-                    result = item_fill_from_file(array->items[array->n], fin);
+                    result = item_insert_from_file(array->items[array->n], fin);
                     if (result == SUCCESS) (array->n)++;
                     else if (result == END_OF_FILE) result = SUCCESS;
                 }
@@ -131,7 +130,7 @@ status array_fill_from_file(ARRAY array, char *fname) {
     return result;
 }
 
-status array_fill_from_keyboard(ARRAY array) {
+status array_insert_from_keyboard(ARRAY array) {
     status result = SUCCESS;
     boolean user_stop = FALSE;
     char user_in, buffer[100];
@@ -150,7 +149,7 @@ status array_fill_from_keyboard(ARRAY array) {
                     result = item_create(&(array->items[i]));
             }
         }
-        result = item_fill_from_keyboard(array->items[array->n]);
+        result = item_insert_from_keyboard(array->items[array->n]);
         if (result == SUCCESS) {
             (array->n)++;
             printf("Do you want to insert a new item?\nType 'y' for 'yes' ore everything else for 'no': ");

@@ -15,8 +15,8 @@ struct item {
 };
 
 status item_create(ITEM *item_pnt) {
-    ITEM item;
     status result = SUCCESS;
+    ITEM item;
 
     item = (ITEM)malloc(sizeof(struct item));
     if (item == NULL) result = OUT_OF_MEMORY;
@@ -31,27 +31,34 @@ status item_create(ITEM *item_pnt) {
     return result;
 }
 
-status item_destroy(ITEM item) {
+status item_create_void(ITEM *item_pnt) {
     status result = SUCCESS;
+    ITEM item;
 
-    if (item == NULL) result = INVALID_INPUT;
+    item = (ITEM)malloc(sizeof(struct item));
+    if (item == NULL) result = OUT_OF_MEMORY;
     else {
-        free(item->str);
-        free(item);
+        item->num = 0;
+        item->str = NULL;
+        item->initialized = 0;
+        *item_pnt = item;
     }
 
     return result;
 }
 
-// Getters
+status item_destroy(ITEM item) {
+    if (item != NULL) {
+        free(item->str);
+        free(item);
+    }
 
-status item_get_key(ITEM item, KEY key);
-
-status item_get_value(ITEM item, VALUE value);
+    return SUCCESS;
+}
 
 // Input
 
-status item_fill_from_file(ITEM item, FILE *fin) {
+status item_insert_from_file(ITEM item, FILE *fin) {
     status result = SUCCESS;
     int n;
 
@@ -66,7 +73,7 @@ status item_fill_from_file(ITEM item, FILE *fin) {
     return result;
 }
 
-status item_fill_from_keyboard(ITEM item) {
+status item_insert_from_keyboard(ITEM item) {
     status result = SUCCESS;
     int n;
 

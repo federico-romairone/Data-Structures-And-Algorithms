@@ -90,27 +90,27 @@ void test_array_create_destroy_sequence() {
 
 
 /**
- * TEST SUITE: array_fill_from_file()
+ * TEST SUITE: array_insert_from_file()
  */
 
 // Read all items from a valid file; reaching EOF is normal and must return SUCCESS.
-void test_array_fill_from_file_success() {
+void test_array_insert_from_file_success() {
     ARRAY array = NULL;
     status result;
     int size, cardinality;
 
     array_create(&array);
-    result = array_fill_from_file(array, "01_Array/input_6in.txt");
+    result = array_insert_from_file(array, "input_6in.txt");
     TEST_ASSERT(result == SUCCESS,
-                "array_fill_from_file returns SUCCESS after reading all items");
+                "array_insert_from_file returns SUCCESS after reading all items");
     
     array_get_size(array, &size);
     TEST_ASSERT(size == 8, 
-                "array_fill_from_file allocates the correct number of elements");
+                "array_insert_from_file allocates the correct number of elements");
 
     array_get_cardinality(array, &cardinality);
     TEST_ASSERT(cardinality == 6, 
-                "array_fill_from_file reads the correct number of elements");
+                "array_insert_from_file reads the correct number of elements");
 
     array_write_out(array, stdout);
 
@@ -118,36 +118,36 @@ void test_array_fill_from_file_success() {
 }
 
 // File that does not exist
-void test_array_fill_from_file_not_found() {
+void test_array_insert_from_file_not_found() {
     ARRAY array = NULL;
     status result;
     
     array_create(&array);
-    result = array_fill_from_file(array, "nonexistent.txt");
+    result = array_insert_from_file(array, "nonexistent.txt");
     TEST_ASSERT(result == FILE_NOT_FOUND,
-                "array_fill_from_file returns FILE_NOT_FOUND for missing file");
+                "array_insert_from_file returns FILE_NOT_FOUND for missing file");
 
     array_destroy(array);
 }
 
 // Empty file: EOF on the very first read is still SUCCESS (0 items read).
-void test_array_fill_from_file_empty() {
+void test_array_insert_from_file_empty() {
     ARRAY array = NULL;
     status result;
     int size, cardinality; 
 
     array_create(&array);
-    result = array_fill_from_file(array, "01_Array/test_empty.txt");
+    result = array_insert_from_file(array, "test_empty.txt");
     TEST_ASSERT(result == SUCCESS,
-                "array_fill_from_file returns SUCCESS for empty file (0 items, EOF)");
+                "array_insert_from_file returns SUCCESS for empty file (0 items, EOF)");
     
     array_get_size(array, &size);
     TEST_ASSERT(size == 1, 
-                "array_fill_from_file allocates the correct number of elements");
+                "array_insert_from_file allocates the correct number of elements");
     
     array_get_cardinality(array, &cardinality);
     TEST_ASSERT(cardinality == 0, 
-                "array_fill_from_file reads the correct number of elements");
+                "array_insert_from_file reads the correct number of elements");
 
     array_write_out(array, stdout);
 
@@ -155,44 +155,44 @@ void test_array_fill_from_file_empty() {
 }
 
 // File with malformed content (no space-separated pair) must return INVALID_FILE_FORMAT.
-void test_array_fill_from_file_invalid_format() {
+void test_array_insert_from_file_invalid_format() {
     ARRAY array = NULL;
     FILE *fin = NULL;
     status result;
     
     array_create(&array);
 
-    fin = fopen("01_Array/test_bad_format.txt", "w");
+    fin = fopen("test_bad_format.txt", "w");
     fprintf(fin, "not a valid item\n");
     fclose(fin);
 
-    result = array_fill_from_file(array, "01_Array/test_bad_format.txt");
+    result = array_insert_from_file(array, "test_bad_format.txt");
 
     TEST_ASSERT(result == INVALID_FILE_FORMAT,
-                "array_fill_from_file returns INVALID_FILE_FORMAT for malformed content");
+                "array_insert_from_file returns INVALID_FILE_FORMAT for malformed content");
 
     array_destroy(array);
 }
 
 
 /**
- * TEST SUITE: array_fill_from_keyboard()
+ * TEST SUITE: array_insert_from_keyboard()
  */
 
 // One item, then 'n' to stop → expected SUCCESS
-void test_array_fill_from_keyboard_single_item() {
+void test_array_insert_from_keyboard_single_item() {
     ARRAY array = NULL;
     status result = SUCCESS;
     int size, cardinality;
 
     printf("Instructions: type one item, then 'n' to stop → expected SUCCESS\n");
     array_create(&array);
-    result = array_fill_from_keyboard(array);
+    result = array_insert_from_keyboard(array);
     array_get_size(array, &size);
     array_get_cardinality(array, &cardinality);
     printf("size='%d' n='%d'\n", size, cardinality);
     TEST_ASSERT(result == SUCCESS,
-                "array_fill_from_keyboard returns SUCCESS after reading one item");
+                "array_insert_from_keyboard returns SUCCESS after reading one item");
     
     array_write_out(array, stdout);
 
@@ -200,19 +200,19 @@ void test_array_fill_from_keyboard_single_item() {
 }
 
 // More than one item separated by 'y', then 'n' to stop → expected SUCCESS
-void test_array_fill_from_keyboard_multiple_items() {
+void test_array_insert_from_keyboard_multiple_items() {
     ARRAY array = NULL;
     status result = SUCCESS;
     int size, cardinality;
 
     printf("Instructions: type more items, then 'n' to stop → expected SUCCESS\n");
     array_create(&array);
-    result = array_fill_from_keyboard(array);
+    result = array_insert_from_keyboard(array);
     array_get_size(array, &size);
     array_get_cardinality(array, &cardinality);
     printf("size='%d' n='%d'\n", size, cardinality);
     TEST_ASSERT(result == SUCCESS,
-                "array_fill_from_keyboard returns SUCCESS after reading one item");
+                "array_insert_from_keyboard returns SUCCESS after reading one item");
     
     array_write_out(array, stdout);
     
@@ -238,15 +238,15 @@ int main() {
     test_array_destroy_null();
     test_array_create_destroy_sequence();
 
-    printf("\nTesting array_fill_from_file()...\n");
-    test_array_fill_from_file_success();
-    test_array_fill_from_file_not_found();
-    test_array_fill_from_file_empty();
-    test_array_fill_from_file_invalid_format();
+    printf("\nTesting array_insert_from_file()...\n");
+    test_array_insert_from_file_success();
+    test_array_insert_from_file_not_found();
+    test_array_insert_from_file_empty();
+    test_array_insert_from_file_invalid_format();
 
-    printf("\nTesting array_fill_from_keyboard()...\n");
-    test_array_fill_from_keyboard_single_item();
-    test_array_fill_from_keyboard_multiple_items();
+    printf("\nTesting array_insert_from_keyboard()...\n");
+    test_array_insert_from_keyboard_single_item();
+    test_array_insert_from_keyboard_multiple_items();
 
     
     // Print summary
