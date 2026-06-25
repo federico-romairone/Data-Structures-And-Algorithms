@@ -80,31 +80,36 @@ void test_list_destroy_null_list() {
 /**
  * TEST SUITE: list_insert_head() + list_insert_tail()
  */
-/*
-static ITEM make_item() {
+
+static ITEM make_item(int n, char *s) {
     ITEM item = NULL;
     item_create(&item);
+    item_insert_data(item, n, s);
     return item;
 }
 
 void test_list_insert_head_single() {
+    status result = SUCCESS;
     LIST list = NULL;
+    ITEM item;
     boolean empty;
 
     list_create(&list);
-    ITEM item = make_item();
-    status result = list_insert_head(list, item);
+    item = make_item(1, "one");
+    result = list_insert_head(list, item);
 
     TEST_ASSERT(result == SUCCESS, "list_insert_head returns SUCCESS");
 
     list_empty(list, &empty);
     TEST_ASSERT(empty == FALSE, "list is not empty after insert_head");
 
+    list_write_out(list, stdout);
+
     list_destroy(list);
 }
 
 void test_list_insert_head_null_list() {
-    ITEM item = make_item();
+    ITEM item = make_item(1, "one");
     status result = list_insert_head(NULL, item);
 
     TEST_ASSERT(result == INVALID_INPUT,
@@ -125,24 +130,45 @@ void test_list_insert_head_null_item() {
     list_destroy(list);
 }
 
-void test_list_insert_tail_single() {
+void test_list_insert_head_multiple_and_destroy() {
+    status result = SUCCESS;
     LIST list = NULL;
-    boolean empty;
+    ITEM item = NULL;
 
     list_create(&list);
-    ITEM item = make_item();
-    status result = list_insert_tail(list, item);
+    for (int i = 0; i < 5; i++) {
+        item = make_item(i+1, "");
+        list_insert_head(list, item);
+    }
+    list_write_out(list, stdout);
+    result = list_destroy(list);
+
+    TEST_ASSERT(result == SUCCESS,
+                "list_destroy returns SUCCESS after inserting multiple items");
+}
+
+void test_list_insert_tail_single() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM item = NULL;
+    boolean empty = FALSE;   
+    
+    list_create(&list); 
+    item = make_item(1, "one");
+    result = list_insert_tail(list, item);
 
     TEST_ASSERT(result == SUCCESS, "list_insert_tail returns SUCCESS");
 
     list_empty(list, &empty);
     TEST_ASSERT(empty == FALSE, "list is not empty after insert_tail");
 
+    list_write_out(list, stdout);
+
     list_destroy(list);
 }
 
 void test_list_insert_tail_null_list() {
-    ITEM item = make_item();
+    ITEM item = make_item(1, "one");
     status result = list_insert_tail(NULL, item);
 
     TEST_ASSERT(result == INVALID_INPUT,
@@ -152,10 +178,11 @@ void test_list_insert_tail_null_list() {
 }
 
 void test_list_insert_tail_null_item() {
+    status result = SUCCESS;
     LIST list = NULL;
 
     list_create(&list);
-    status result = list_insert_tail(list, NULL);
+    result = list_insert_tail(list, NULL);
 
     TEST_ASSERT(result == INVALID_INPUT,
                 "list_insert_tail returns INVALID_INPUT for NULL item");
@@ -163,20 +190,23 @@ void test_list_insert_tail_null_item() {
     list_destroy(list);
 }
 
-void test_list_insert_multiple_and_destroy() {
+void test_list_insert_tail_multiple_and_destroy() {
+    status result = SUCCESS;
     LIST list = NULL;
+    ITEM item = NULL;
 
     list_create(&list);
     for (int i = 0; i < 5; i++) {
-        ITEM item = make_item();
+        item = make_item(i+1, "");
         list_insert_tail(list, item);
     }
-    status result = list_destroy(list);
+    list_write_out(list, stdout);
+    result = list_destroy(list);
 
     TEST_ASSERT(result == SUCCESS,
                 "list_destroy returns SUCCESS after inserting multiple items");
 }
-*/
+
 
 /**
  * TEST SUITE: list_empty()
@@ -411,23 +441,24 @@ int main() {
     printf("\nTesting list_destroy()...\n");
     test_list_destroy_empty_list();
     test_list_destroy_null_list();
-    /*
-    printf("\nTesting list_empty()...\n");
-    test_list_empty_on_empty_list();
-    test_list_empty_after_insert();
-    test_list_empty_null_list();
-    test_list_empty_null_result();
 
     printf("\nTesting list_insert_head()...\n");
     test_list_insert_head_single();
     test_list_insert_head_null_list();
     test_list_insert_head_null_item();
+    test_list_insert_head_multiple_and_destroy();
 
     printf("\nTesting list_insert_tail()...\n");
     test_list_insert_tail_single();
     test_list_insert_tail_null_list();
     test_list_insert_tail_null_item();
-    test_list_insert_multiple_and_destroy();
+    test_list_insert_tail_multiple_and_destroy();
+/*
+    printf("\nTesting list_empty()...\n");
+    test_list_empty_on_empty_list();
+    test_list_empty_after_insert();
+    test_list_empty_null_list();
+    test_list_empty_null_result();
 
     printf("\nTesting list_delete_head()...\n");
     test_list_delete_head_with_extract();
@@ -445,7 +476,7 @@ int main() {
     test_list_write_out_with_items();
     test_list_write_out_null_list();
     test_list_write_out_null_file();
-    */
+*/
     printf("\n========================================\n");
     printf("  TEST RESULTS: %d/%d passed\n", tests_passed, tests_run);
     printf("========================================\n");
