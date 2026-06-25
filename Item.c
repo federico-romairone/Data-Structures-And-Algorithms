@@ -11,8 +11,20 @@
 struct item {
     int num;
     char *str;
-    int initialized;
+    boolean initialized;
 };
+
+// Key functions
+
+KEY key_get(ITEM item) {
+    return item == NULL ? NULL : strdup(item->str);
+}
+
+int key_cmp(KEY k1, KEY k2) {
+    return strcmp(k1, k2);
+}
+
+// Memory handling 
 
 status item_create(ITEM *item_pnt) {
     status result = SUCCESS;
@@ -24,7 +36,7 @@ status item_create(ITEM *item_pnt) {
         item->num = 0;
         item->str = (char*)malloc(MAX_KEY_LEN * sizeof(char));
         item->str[0] = '\0';
-        item->initialized = 0;
+        item->initialized = FALSE;
         *item_pnt = item;
     }
 
@@ -40,7 +52,7 @@ status item_create_void(ITEM *item_pnt) {
     else {
         item->num = 0;
         item->str = NULL;
-        item->initialized = 0;
+        item->initialized = FALSE;
         *item_pnt = item;
     }
 
@@ -86,6 +98,19 @@ status item_insert_from_keyboard(ITEM item) {
     }
 
     return result;
+}
+
+status item_insert_data(ITEM item, int n, char *s) {
+    status result = SUCCESS;
+
+    if (item == NULL) result = INVALID_INPUT;
+    else {
+        item->num = n;
+        item->str = strdup(s);
+        item->initialized = TRUE;
+    }
+
+    return SUCCESS;
 }
 
 // Output
