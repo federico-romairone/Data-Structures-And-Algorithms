@@ -14,7 +14,8 @@ typedef enum {
     INVALID_INPUT,
     FILE_NOT_FOUND,
     INVALID_FILE_FORMAT,
-    END_OF_FILE
+    END_OF_FILE,
+    NOT_FOUND
 } status;
 
 /**

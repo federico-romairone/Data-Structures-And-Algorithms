@@ -84,5 +84,15 @@ status item_insert_data(ITEM item, int n, char *s);
  */
 status item_write_out(ITEM item, FILE *fout);
 
+// Utilities
+
+/**
+ * @brief Copies variables' values of the second item in the first one.
+ * @param[in]   dest    The destination item.
+ * @param[in]   source  The source item.
+ * @return The type of error occurred, SUCCESS if none.
+ */
+status item_cpy(ITEM dest, ITEM source);
+
 
 #endif

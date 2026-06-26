@@ -49,10 +49,30 @@ status list_insert_head(LIST list, ITEM item);
  */
 status list_insert_tail(LIST list, ITEM item);
 
+/**
+ * @brief Delete the item in list head.
+ * @param[in]   list        The list from which the item is deleted.
+ * @param[in]   extract     If TRUE, the item is extracted.
+ * @param[out]  item_pnt    If extract is TRUE, the item is saved in the pointed variable.
+ */
 status list_delete_head(LIST list, boolean extract, ITEM *item_pnt);
 
+/**
+ * @brief Delete the item in list in a precise position.
+ * @param[in]   list        The list from which the item is deleted.
+ * @param[in]   index       The index of the item which has to be deleted.
+ * @param[in]   extract     If TRUE, the item is extracted.
+ * @param[out]  item_pnt    If extract is TRUE, the item is saved in the pointed variable.
+ */
 status list_delete_position(LIST list, int index, boolean extract, ITEM *item_pnt);
 
+/**
+ * @brief Delete the item in list with a precise key.
+ * @param[in]   list        The list from which the item is deleted.
+ * @param[in]   key         The key of the item which has to be deleted.
+ * @param[in]   extract     If TRUE, the item is extracted.
+ * @param[out]  item_pnt    If extract is TRUE, the item is saved in the pointed variable.
+ */
 status list_delete_key(LIST list, KEY key, boolean extract, ITEM *item_pnt);
 
 // Setters and status

@@ -107,7 +107,7 @@ status list_destroy(LIST list) {
         result = destroy_recursive(list->head, list->z);
         if (result == SUCCESS) {
             result = node_destroy(list->z);
-            free(list);
+            if (result == SUCCESS) free(list);
         }
     }
 
@@ -177,7 +177,32 @@ status list_insert_tail(LIST list, ITEM item) {
     return result;
 }
 
-status list_delete_head(LIST list, boolean extract, ITEM *item_pnt);
+status list_delete_head(LIST list, boolean extract, ITEM *item_pnt) {
+    status result = SUCCESS;
+    link x = NULL;
+    ITEM item = NULL;
+
+    if (list == NULL || (extract && item_pnt == NULL)) result = INVALID_INPUT;
+    else {
+        if (list->n != 0) {
+            x = list->head;
+            list->head = list->head->next;
+            if (list->n == 1) list->tail = list->head;
+            list->n--;
+            if (extract) {
+                result = item_create(&item);
+                if (result == SUCCESS) {
+                    item_cpy(item, x->val);
+                    *item_pnt = item;
+                }
+                else item_destroy(item);
+            }
+            node_destroy(x);
+        }
+    }
+
+    return result;
+}
 
 status list_delete_position(LIST list, int index, boolean extract, ITEM *item_pnt);
  
@@ -188,7 +213,7 @@ status list_delete_key(LIST list, KEY key, boolean extract, ITEM *item_pnt);
 status list_empty(LIST list, boolean *empty_pnt) {
     status result = SUCCESS;
 
-    if (list == NULL) result = INVALID_INPUT;
+    if (list == NULL || empty_pnt == NULL) result = INVALID_INPUT;
     else *empty_pnt = (list->n == 0);
 
     return result;
@@ -220,7 +245,7 @@ status list_write_out(LIST list, FILE *fout) {
 
     if (list == NULL || fout == NULL) result = INVALID_INPUT;
     else {
-        fprintf(fout, "LIST: ");
+        fprintf(fout, "--- List ---\n");
         result = traversal(list->head, list->z, fout);
         if (result == SUCCESS) {
             fprintf(fout, "\nHead: ");
@@ -230,6 +255,7 @@ status list_write_out(LIST list, FILE *fout) {
             fprintf(fout, "\nn = %d\n", list->n);
         }
         else fprintf(fout, "Error!\n");
+        fprintf(fout, "-------------\n");
     }
 
     return result;

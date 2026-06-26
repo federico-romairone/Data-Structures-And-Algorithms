@@ -106,6 +106,7 @@ status item_insert_data(ITEM item, int n, char *s) {
     if (item == NULL) result = INVALID_INPUT;
     else {
         item->num = n;
+        free(item->str);
         item->str = strdup(s);
         item->initialized = TRUE;
     }
@@ -121,6 +122,20 @@ status item_write_out(ITEM item, FILE *fout) {
     if (item == NULL || fout == NULL) result = INVALID_INPUT;
     else fprintf(fout, "{ number='%d' value='%s' initialized='%s' }",
                 item->num, item->str, item->initialized == TRUE ? "TRUE" : "FALSE");  
+
+    return result;
+}
+
+status item_cpy(ITEM dest, ITEM source) {
+    status result = SUCCESS;
+
+    if (dest == NULL || source == NULL)  result = INVALID_INPUT;
+    else {
+        dest->num = source->num;
+        free(dest->str);
+        dest->str = strdup(source->str);
+        dest->initialized = source->initialized;
+    }
 
     return result;
 }

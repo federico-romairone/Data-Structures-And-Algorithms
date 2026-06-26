@@ -211,7 +211,7 @@ void test_list_insert_tail_multiple_and_destroy() {
 /**
  * TEST SUITE: list_empty()
  */
-/*
+
 void test_list_empty_on_empty_list() {
     LIST list = NULL;
     boolean empty;
@@ -228,7 +228,7 @@ void test_list_empty_on_empty_list() {
 void test_list_empty_after_insert() {
     LIST list = NULL;
     boolean empty;
-    ITEM item = make_item();
+    ITEM item = make_item(1, "one");
 
     list_create(&list);
     list_insert_head(list, item);
@@ -248,31 +248,35 @@ void test_list_empty_null_list() {
 }
 
 void test_list_empty_null_result() {
+    status result = SUCCESS;
     LIST list = NULL;
 
     list_create(&list);
-    status result = list_empty(list, NULL);
+    result = list_empty(list, NULL);
 
     TEST_ASSERT(result == INVALID_INPUT,
                 "list_empty returns INVALID_INPUT for NULL result pointer");
 
     list_destroy(list);
 }
-*/
+
 
 /**
  * TEST SUITE: list_delete_head()
  */
-/*
+
 void test_list_delete_head_with_extract() {
+    status result = SUCCESS;
     LIST list = NULL;
-    ITEM item = make_item();
+    ITEM item = make_item(1, "one");
     ITEM extracted = NULL;
     boolean empty;
 
     list_create(&list);
     list_insert_head(list, item);
-    status result = list_delete_head(list, TRUE, &extracted);
+    list_write_out(list, stdout);
+    result = list_delete_head(list, TRUE, &extracted);
+    list_write_out(list, stdout);
 
     TEST_ASSERT(result == SUCCESS,
                 "list_delete_head returns SUCCESS with extract=TRUE");
@@ -287,13 +291,14 @@ void test_list_delete_head_with_extract() {
 }
 
 void test_list_delete_head_without_extract() {
+    status result = SUCCESS;    
     LIST list = NULL;
-    ITEM item = make_item();
+    ITEM item = make_item(1, "one");
     boolean empty;
 
     list_create(&list);
     list_insert_head(list, item);
-    status result = list_delete_head(list, FALSE, NULL);
+    result = list_delete_head(list, FALSE, NULL);
 
     TEST_ASSERT(result == SUCCESS,
                 "list_delete_head returns SUCCESS with extract=FALSE");
@@ -305,13 +310,14 @@ void test_list_delete_head_without_extract() {
 }
 
 void test_list_delete_head_empty_list() {
+    status result = SUCCESS;
     LIST list = NULL;
 
     list_create(&list);
-    status result = list_delete_head(list, FALSE, NULL);
+    result = list_delete_head(list, FALSE, NULL);
 
-    TEST_ASSERT(result != SUCCESS,
-                "list_delete_head fails on empty list");
+    TEST_ASSERT(result == SUCCESS,
+                "list_delete_head does nothing on empty list");
 
     list_destroy(list);
 }
@@ -322,7 +328,42 @@ void test_list_delete_head_null_list() {
     TEST_ASSERT(result == INVALID_INPUT,
                 "list_delete_head returns INVALID_INPUT for NULL list");
 }
-*/
+
+void test_list_delete_head_with_extract_more_items() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM item = NULL;
+    ITEM extracted = NULL;
+    boolean empty;
+
+    list_create(&list);
+    for (int i = 0; i < 5; i++) {
+        item = make_item(i+1, "");
+        list_insert_head(list, item);
+    }
+    list_write_out(list, stdout);
+    result = list_delete_head(list, TRUE, &extracted);
+    list_write_out(list, stdout);
+    fprintf(stdout, "Ecxtracted item: "); 
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS,
+                "list_delete_head returns SUCCESS with extract=TRUE");
+    TEST_ASSERT(extracted != NULL,
+                "list_delete_head extracts the item when extract=TRUE");
+    
+    item_destroy(extracted);
+    for (int i = 0; i < 4; i++) {
+        list_delete_head(list, TRUE, &extracted);
+        item_destroy(extracted);
+    }
+    list_empty(list, &empty);
+    TEST_ASSERT(empty == TRUE, "list is empty after deleting all elements");
+
+    list_destroy(list);
+}
+
 
 /**
  * TEST SUITE: list_search()
@@ -373,58 +414,6 @@ void test_list_search_null_list() {
 */
 
 /**
- * TEST SUITE: list_write_out()
- */
-/*
-void test_list_write_out_empty_list() {
-    LIST list = NULL;
-
-    list_create(&list);
-    status result = list_write_out(list, stdout);
-
-    TEST_ASSERT(result == SUCCESS, "list_write_out returns SUCCESS on empty list");
-
-    list_destroy(list);
-}
-
-void test_list_write_out_with_items() {
-    LIST list = NULL;
-
-    list_create(&list);
-    for (int i = 0; i < 3; i++) {
-        ITEM item = make_item();
-        list_insert_tail(list, item);
-    }
-
-    printf("  (output below)\n");
-    status result = list_write_out(list, stdout);
-
-    TEST_ASSERT(result == SUCCESS, "list_write_out returns SUCCESS with items");
-
-    list_destroy(list);
-}
-
-void test_list_write_out_null_list() {
-    status result = list_write_out(NULL, stdout);
-
-    TEST_ASSERT(result == INVALID_INPUT,
-                "list_write_out returns INVALID_INPUT for NULL list");
-}
-
-void test_list_write_out_null_file() {
-    LIST list = NULL;
-
-    list_create(&list);
-    status result = list_write_out(list, NULL);
-
-    TEST_ASSERT(result == INVALID_INPUT,
-                "list_write_out returns INVALID_INPUT for NULL file");
-
-    list_destroy(list);
-}
-*/
-
-/**
  * MAIN TEST RUNNER
  */
 
@@ -453,7 +442,7 @@ int main() {
     test_list_insert_tail_null_list();
     test_list_insert_tail_null_item();
     test_list_insert_tail_multiple_and_destroy();
-/*
+
     printf("\nTesting list_empty()...\n");
     test_list_empty_on_empty_list();
     test_list_empty_after_insert();
@@ -465,17 +454,12 @@ int main() {
     test_list_delete_head_without_extract();
     test_list_delete_head_empty_list();
     test_list_delete_head_null_list();
-
+    test_list_delete_head_with_extract_more_items();
+/*
     printf("\nTesting list_search()...\n");
     test_list_search_existing_key();
     test_list_search_missing_key();
     test_list_search_null_list();
-
-    printf("\nTesting list_write_out()...\n");
-    test_list_write_out_empty_list();
-    test_list_write_out_with_items();
-    test_list_write_out_null_list();
-    test_list_write_out_null_file();
 */
     printf("\n========================================\n");
     printf("  TEST RESULTS: %d/%d passed\n", tests_passed, tests_run);
