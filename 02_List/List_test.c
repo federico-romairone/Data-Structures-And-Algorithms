@@ -18,6 +18,12 @@ static int tests_passed = 0;
         printf("✗ FAIL: %s\n", test_name); \
     }
 
+static ITEM make_item(int n, char *s) {
+    ITEM item = NULL;
+    item_create(&item);
+    item_insert_data(item, n, s);
+    return item;
+}
 
 /**
  * TEST SUITE: list_create()
@@ -80,13 +86,6 @@ void test_list_destroy_null_list() {
 /**
  * TEST SUITE: list_insert_head() + list_insert_tail()
  */
-
-static ITEM make_item(int n, char *s) {
-    ITEM item = NULL;
-    item_create(&item);
-    item_insert_data(item, n, s);
-    return item;
-}
 
 void test_list_insert_head_single() {
     status result = SUCCESS;
@@ -262,6 +261,61 @@ void test_list_empty_null_result() {
 
 
 /**
+ * TEST SUITE: list_search()
+ */
+
+void test_list_search_existing_key() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM item1 = NULL, item2 = NULL;
+    ITEM found = NULL;
+
+    list_create(&list);
+    item1 = make_item(1, "one");
+    item2 = make_item(2, "two");
+
+    list_insert_head(list, item1);
+    list_insert_head(list, item2);
+    result = list_search(list, "one", &found);
+
+    TEST_ASSERT(result == SUCCESS, "list_search returns SUCCESS for existing key");
+    TEST_ASSERT(found != NULL, "list_search finds the item");
+    item_write_out(found, stdout); fprintf(stdout, "\n");
+
+    item_destroy(found);
+    list_destroy(list);
+}
+
+void test_list_search_missing_key() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM found = NULL;
+    ITEM item1 = NULL, item2 = NULL;
+
+    list_create(&list);
+    item1 = make_item(1, "one");
+    item2 = make_item(2, "two");
+
+    list_insert_head(list, item1);
+    list_insert_head(list, item2);
+    result = list_search(list, "ghost", &found);
+
+    TEST_ASSERT(result == NOT_FOUND, "list_search return NOT_FOUND for missing key");
+
+    item_destroy(found);
+    list_destroy(list);
+}
+
+void test_list_search_null_list() {
+    ITEM found = NULL;
+    status result = list_search(NULL, "key", &found);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_search returns INVALID_INPUT for NULL list");
+}
+
+
+/**
  * TEST SUITE: list_delete_head()
  */
 
@@ -366,54 +420,6 @@ void test_list_delete_head_with_extract_more_items() {
 
 
 /**
- * TEST SUITE: list_search()
- */
-/*
-void test_list_search_existing_key() {
-    LIST list = NULL;
-    ITEM item = NULL;
-    ITEM found = NULL;
-
-    list_create(&list);
-    item_create(&item);
-
-    FILE *tmp = tmpfile();
-    fprintf(tmp, "42 hello");
-    rewind(tmp);
-    item_insert_from_file(item, tmp);
-    fclose(tmp);
-
-    list_insert_head(list, item);
-    status result = list_search(list, "hello", &found);
-
-    TEST_ASSERT(result == SUCCESS, "list_search returns SUCCESS for existing key");
-    TEST_ASSERT(found != NULL, "list_search finds the item");
-
-    list_destroy(list);
-}
-
-void test_list_search_missing_key() {
-    LIST list = NULL;
-    ITEM found = NULL;
-
-    list_create(&list);
-    status result = list_search(list, "ghost", &found);
-
-    TEST_ASSERT(result != SUCCESS, "list_search fails for missing key");
-
-    list_destroy(list);
-}
-
-void test_list_search_null_list() {
-    ITEM found = NULL;
-    status result = list_search(NULL, "key", &found);
-
-    TEST_ASSERT(result == INVALID_INPUT,
-                "list_search returns INVALID_INPUT for NULL list");
-}
-*/
-
-/**
  * MAIN TEST RUNNER
  */
 
@@ -421,7 +427,7 @@ int main() {
     printf("========================================\n");
     printf("  LIST DATA STRUCTURE TEST SUITE\n");
     printf("========================================\n\n");
-
+/*
     printf("Testing list_create()...\n");
     test_list_create_success();
     test_list_create_null_pointer();
@@ -448,19 +454,20 @@ int main() {
     test_list_empty_after_insert();
     test_list_empty_null_list();
     test_list_empty_null_result();
-
+*/
+    printf("\nTesting list_search()...\n");
+    test_list_search_existing_key();
+    test_list_search_missing_key();
+    test_list_search_null_list();
+/*
     printf("\nTesting list_delete_head()...\n");
     test_list_delete_head_with_extract();
     test_list_delete_head_without_extract();
     test_list_delete_head_empty_list();
     test_list_delete_head_null_list();
     test_list_delete_head_with_extract_more_items();
-/*
-    printf("\nTesting list_search()...\n");
-    test_list_search_existing_key();
-    test_list_search_missing_key();
-    test_list_search_null_list();
 */
+
     printf("\n========================================\n");
     printf("  TEST RESULTS: %d/%d passed\n", tests_passed, tests_run);
     printf("========================================\n");

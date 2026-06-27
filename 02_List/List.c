@@ -118,12 +118,23 @@ status list_destroy(LIST list) {
 
 static status search_recursive(link x, link z, KEY key, ITEM *item_pnt) {
     status result = SUCCESS;
+    KEY item_key = NULL;
 
     if (x == NULL) result = INVALID_INPUT;
-    else if (x == z) result = item_create_void(item_pnt);
-    else if (key_cmp(key, key_get(x->val)) == 0) *item_pnt = x->val;
-    else result = search_recursive(x->next, z, key, item_pnt);
-
+    else if (x == z) {
+        result = item_create_void(item_pnt);
+        if (result == SUCCESS) result = NOT_FOUND;
+    }
+    else {
+        item_key = key_get(x->val);    
+        if (key_cmp(key, item_key) == 0) {
+            result = item_create(item_pnt);
+            if (result == SUCCESS) item_cpy(*item_pnt, x->val);
+        }
+        else result = search_recursive(x->next, z, key, item_pnt);
+        free(item_key);
+    }
+    
     return result;
 }
 
