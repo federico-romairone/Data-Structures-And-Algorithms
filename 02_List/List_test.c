@@ -420,6 +420,299 @@ void test_list_delete_head_with_extract_more_items() {
 
 
 /**
+ * TEST SUITE: list_delete_position()
+ */
+
+void test_list_delete_position_head() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM extracted = NULL;
+    boolean empty;
+
+    list_create(&list);
+    for (int i = 0; i < 3; i++) list_insert_tail(list, make_item(i+1, ""));
+    list_write_out(list, stdout);
+    result = list_delete_position(list, 0, TRUE, &extracted);
+    list_write_out(list, stdout);
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_position: delete head returns SUCCESS");
+    TEST_ASSERT(extracted != NULL, "list_delete_position: head item extracted");
+
+    item_destroy(extracted);
+    list_destroy(list);
+}
+
+void test_list_delete_position_tail() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM extracted = NULL;
+
+    list_create(&list);
+    for (int i = 0; i < 3; i++) list_insert_tail(list, make_item(i+1, ""));
+    list_write_out(list, stdout);
+    result = list_delete_position(list, 2, TRUE, &extracted);
+    list_write_out(list, stdout);
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_position: delete tail returns SUCCESS");
+    TEST_ASSERT(extracted != NULL, "list_delete_position: tail item extracted");
+
+    item_destroy(extracted);
+    list_destroy(list);
+}
+
+void test_list_delete_position_middle() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM extracted = NULL;
+
+    list_create(&list);
+    for (int i = 0; i < 5; i++) list_insert_tail(list, make_item(i+1, ""));
+    list_write_out(list, stdout);
+    result = list_delete_position(list, 2, TRUE, &extracted);
+    list_write_out(list, stdout);
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_position: delete middle returns SUCCESS");
+    TEST_ASSERT(extracted != NULL, "list_delete_position: middle item extracted");
+
+    item_destroy(extracted);
+    list_destroy(list);
+}
+
+void test_list_delete_position_without_extract() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    boolean empty;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    result = list_delete_position(list, 0, FALSE, NULL);
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_position: extract=FALSE returns SUCCESS");
+    list_empty(list, &empty);
+    TEST_ASSERT(empty == TRUE, "list_delete_position: list empty after delete without extract");
+
+    list_destroy(list);
+}
+
+void test_list_delete_position_null_list() {
+    ITEM extracted = NULL;
+    status result = list_delete_position(NULL, 0, FALSE, NULL);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_delete_position: NULL list returns INVALID_INPUT");
+}
+
+void test_list_delete_position_negative_index() {
+    status result = SUCCESS;
+    LIST list = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    result = list_delete_position(list, -1, FALSE, NULL);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_delete_position: negative index returns INVALID_INPUT");
+
+    list_destroy(list);
+}
+
+void test_list_delete_position_out_of_bounds() {
+    status result = SUCCESS;
+    LIST list = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    result = list_delete_position(list, 5, FALSE, NULL);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_delete_position: out-of-bounds index returns INVALID_INPUT");
+
+    list_destroy(list);
+}
+
+void test_list_delete_position_extract_null_pnt() {
+    status result = SUCCESS;
+    LIST list = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    result = list_delete_position(list, 0, TRUE, NULL);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_delete_position: extract=TRUE with NULL item_pnt returns INVALID_INPUT");
+
+    list_destroy(list);
+}
+
+void test_list_delete_position_all_elements() {
+    LIST list = NULL;
+    ITEM extracted = NULL;
+    boolean empty;
+    status result = SUCCESS;
+
+    list_create(&list);
+    for (int i = 0; i < 3; i++) list_insert_tail(list, make_item(i+1, ""));
+    for (int i = 0; i < 3; i++) {
+        result = list_delete_position(list, 0, TRUE, &extracted);
+        item_destroy(extracted);
+        extracted = NULL;
+    }
+    list_empty(list, &empty);
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_position: deleting all elements returns SUCCESS");
+    TEST_ASSERT(empty == TRUE, "list_delete_position: list empty after removing all elements");
+
+    list_destroy(list);
+}
+
+
+/**
+ * TEST SUITE: list_delete_key()
+ */
+
+void test_list_delete_key_head() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM extracted = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    list_insert_tail(list, make_item(2, "two"));
+    list_insert_tail(list, make_item(3, "three"));
+    list_write_out(list, stdout);
+    result = list_delete_key(list, "one", TRUE, &extracted);
+    list_write_out(list, stdout);
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_key: delete head by key returns SUCCESS");
+    TEST_ASSERT(extracted != NULL, "list_delete_key: head item extracted by key");
+
+    item_destroy(extracted);
+    list_destroy(list);
+}
+
+void test_list_delete_key_tail() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM extracted = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    list_insert_tail(list, make_item(2, "two"));
+    list_insert_tail(list, make_item(3, "three"));
+    list_write_out(list, stdout);
+    result = list_delete_key(list, "three", TRUE, &extracted);
+    list_write_out(list, stdout);
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_key: delete tail by key returns SUCCESS");
+    TEST_ASSERT(extracted != NULL, "list_delete_key: tail item extracted by key");
+
+    item_destroy(extracted);
+    list_destroy(list);
+}
+
+void test_list_delete_key_middle() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    ITEM extracted = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    list_insert_tail(list, make_item(2, "two"));
+    list_insert_tail(list, make_item(3, "three"));
+    list_write_out(list, stdout);
+    result = list_delete_key(list, "two", TRUE, &extracted);
+    list_write_out(list, stdout);
+    item_write_out(extracted, stdout);
+    fprintf(stdout, "\n");
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_key: delete middle by key returns SUCCESS");
+    TEST_ASSERT(extracted != NULL, "list_delete_key: middle item extracted by key");
+
+    item_destroy(extracted);
+    list_destroy(list);
+}
+
+void test_list_delete_key_without_extract() {
+    status result = SUCCESS;
+    LIST list = NULL;
+    boolean empty;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    result = list_delete_key(list, "one", FALSE, NULL);
+
+    TEST_ASSERT(result == SUCCESS, "list_delete_key: extract=FALSE returns SUCCESS");
+
+    list_empty(list, &empty);
+    TEST_ASSERT(empty == TRUE, "list_delete_key: list empty after delete without extract");
+
+    list_destroy(list);
+}
+
+void test_list_delete_key_not_found() {
+    status result = SUCCESS;
+    LIST list = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    list_insert_tail(list, make_item(2, "two"));
+    result = list_delete_key(list, "ghost", FALSE, NULL);
+
+    TEST_ASSERT(result == NOT_FOUND, "list_delete_key: missing key returns NOT_FOUND");
+
+    list_destroy(list);
+}
+
+void test_list_delete_key_null_list() {
+    status result = list_delete_key(NULL, "one", FALSE, NULL);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_delete_key: NULL list returns INVALID_INPUT");
+}
+
+void test_list_delete_key_extract_null_pnt() {
+    status result = SUCCESS;
+    LIST list = NULL;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    result = list_delete_key(list, "one", TRUE, NULL);
+
+    TEST_ASSERT(result == INVALID_INPUT,
+                "list_delete_key: extract=TRUE with NULL item_pnt returns INVALID_INPUT");
+
+    list_destroy(list);
+}
+
+void test_list_delete_key_preserves_structure() {
+    LIST list = NULL;
+    boolean empty;
+
+    list_create(&list);
+    list_insert_tail(list, make_item(1, "one"));
+    list_insert_tail(list, make_item(2, "two"));
+    list_insert_tail(list, make_item(3, "three"));
+    list_delete_key(list, "two", FALSE, NULL);
+
+    list_empty(list, &empty);
+    TEST_ASSERT(empty == FALSE, "list_delete_key: list still has elements after partial delete");
+
+    list_write_out(list, stdout);
+    list_destroy(list);
+}
+
+
+/**
  * MAIN TEST RUNNER
  */
 
@@ -427,7 +720,7 @@ int main() {
     printf("========================================\n");
     printf("  LIST DATA STRUCTURE TEST SUITE\n");
     printf("========================================\n\n");
-/*
+    /*
     printf("Testing list_create()...\n");
     test_list_create_success();
     test_list_create_null_pointer();
@@ -454,20 +747,40 @@ int main() {
     test_list_empty_after_insert();
     test_list_empty_null_list();
     test_list_empty_null_result();
-*/
+
     printf("\nTesting list_search()...\n");
     test_list_search_existing_key();
     test_list_search_missing_key();
     test_list_search_null_list();
-/*
+    
     printf("\nTesting list_delete_head()...\n");
     test_list_delete_head_with_extract();
     test_list_delete_head_without_extract();
     test_list_delete_head_empty_list();
     test_list_delete_head_null_list();
     test_list_delete_head_with_extract_more_items();
-*/
 
+    printf("\nTesting list_delete_position()...\n");
+    test_list_delete_position_head();
+    test_list_delete_position_tail();
+    test_list_delete_position_middle();
+    test_list_delete_position_without_extract();
+    test_list_delete_position_null_list();
+    test_list_delete_position_negative_index();
+    test_list_delete_position_out_of_bounds();
+    test_list_delete_position_extract_null_pnt();
+    test_list_delete_position_all_elements();
+
+    printf("\nTesting list_delete_key()...\n");
+    test_list_delete_key_head();
+    test_list_delete_key_tail();
+    test_list_delete_key_middle();
+    test_list_delete_key_without_extract();
+    test_list_delete_key_not_found();
+    test_list_delete_key_null_list();
+    test_list_delete_key_extract_null_pnt();
+    test_list_delete_key_preserves_structure();
+    */
     printf("\n========================================\n");
     printf("  TEST RESULTS: %d/%d passed\n", tests_passed, tests_run);
     printf("========================================\n");

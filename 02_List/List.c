@@ -134,7 +134,7 @@ static status search_recursive(link x, link z, KEY key, ITEM *item_pnt) {
         else result = search_recursive(x->next, z, key, item_pnt);
         free(item_key);
     }
-    
+
     return result;
 }
 
@@ -215,9 +215,91 @@ status list_delete_head(LIST list, boolean extract, ITEM *item_pnt) {
     return result;
 }
 
-status list_delete_position(LIST list, int index, boolean extract, ITEM *item_pnt);
+static status delete_recursive_index(link *tp, link p, link x, link z, int cnt, boolean extract, ITEM *item_pnt) {
+    status result = SUCCESS;
+    ITEM item = NULL;
+
+    if (cnt == 0) {
+        if (extract) {
+            result = item_create(&item);
+            if (result == SUCCESS) {
+                result = item_cpy(item, x->val);
+                if (result == SUCCESS) *item_pnt = item;
+                else item_destroy(item);
+            }
+        }
+        p->next = x->next;
+        // delete tail
+        if (x == *tp) *tp = p;
+        node_destroy(x);
+    }
+    else result = delete_recursive_index(tp, x, x->next, z, --cnt, extract, item_pnt);
+
+    return result;
+}
+
+status list_delete_position(LIST list, int index, boolean extract, ITEM *item_pnt) {
+    status result = SUCCESS;
+
+    if (list == NULL || index < 0 || index >= list->n || (extract && item_pnt == NULL))
+        result = INVALID_INPUT;
+    else if (index == 0) result = list_delete_head(list, extract, item_pnt);
+    else {
+        result = delete_recursive_index(&(list->tail), NULL, list->head, list->z, index, extract, item_pnt);
+        if (result == SUCCESS) list->n--;
+    }
+
+    return result;
+}
+
+static status delete_recursive_key(link *tp, link p, link x, link z, KEY key, boolean extract, ITEM *item_pnt) {
+    status result = SUCCESS;
+    ITEM item = NULL;
+    KEY item_key = NULL;
+
+    if (x == z) result = NOT_FOUND;
+    else {
+        item_key = key_get(x->val);
+        if (key_cmp(item_key, key) == 0) {
+            if (extract) {
+                result = item_create(&item);
+                if (result == SUCCESS) {
+                    result = item_cpy(item, x->val);
+                    if (result == SUCCESS) *item_pnt = item;
+                    else item_destroy(item);
+                }
+            }
+            p->next = x->next;
+            // delete tail
+            if (x == *tp) *tp = p;
+            node_destroy(x);
+        }
+        else result = delete_recursive_key(tp, x, x->next, z, key, extract, item_pnt);
+        free(item_key);
+    }
+
+    return result;
+}
+
  
-status list_delete_key(LIST list, KEY key, boolean extract, ITEM *item_pnt);
+status list_delete_key(LIST list, KEY key, boolean extract, ITEM *item_pnt) {
+    status result = SUCCESS;
+    KEY head_key = NULL;
+
+    if (list == NULL || (extract && item_pnt == NULL))
+        result = INVALID_INPUT;
+    else {
+        head_key = key_get(list->head->val);
+        if (key_cmp(head_key, key) == 0) result = list_delete_head(list, extract, item_pnt);
+        else {
+            result = delete_recursive_key(&(list->tail), list->head, list->head->next, list->z, key, extract, item_pnt);
+            if (result == SUCCESS) list->n--;
+        }
+        free(head_key);
+    }
+
+    return result;
+}
 
 // Setters and status
 
